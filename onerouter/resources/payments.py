@@ -15,19 +15,36 @@ class PaymentsResource:
         self,
         amount: float,
         currency: str = "INR",
+        method: Optional[str] = None,
+        provider: Optional[str] = None,
         receipt: Optional[str] = None,
         notes: Optional[Dict[str, Any]] = None,
-        idempotency_key: Optional[str] = None
+        idempotency_key: Optional[str] = None,
+        # Payment method specific options
+        upi_app: Optional[str] = None,
+        emi_plan: Optional[str] = None,
+        card_network: Optional[str] = None,
+        wallet_provider: Optional[str] = None,
+        bank_code: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Create a payment order
+        Create a payment order with payment method support
 
         Args:
             amount: Amount in currency units (e.g., 500.00 for ₹500)
             currency: Currency code (INR, USD, etc.)
+            method: Payment method ('upi', 'card', 'netbanking', 'wallet', etc.)
+            provider: Force specific provider ('razorpay', 'paypal')
             receipt: Optional receipt ID
             notes: Optional metadata
             idempotency_key: Optional idempotency key
+
+            # Payment method specific options:
+            upi_app: UPI app preference ('gpay', 'phonepe', 'paytm', 'bhim', etc.)
+            emi_plan: EMI plan ('3_months', '6_months', '12_months', etc.)
+            card_network: Preferred card network ('visa', 'mastercard', 'amex', etc.)
+            wallet_provider: Wallet provider ('paytm', 'mobikwik', 'olamoney', etc.)
+            bank_code: Net banking bank code (for Razorpay)
 
         Returns:
             {
@@ -37,7 +54,9 @@ class PaymentsResource:
                 "amount": 500.00,
                 "currency": "INR",
                 "status": "created",
-                "checkout_url": "https://..."
+                "checkout_url": "https://...",
+                "payment_method": "upi",  # New field
+                "method_details": {...}   # New field with method-specific info
             }
         """
         if not idempotency_key:
@@ -48,6 +67,25 @@ class PaymentsResource:
             "currency": currency
         }
 
+        # Add payment method preferences
+        if method:
+            data["method"] = method
+        if provider:
+            data["provider"] = provider
+
+        # Add method-specific options
+        if upi_app:
+            data["upi_app"] = upi_app
+        if emi_plan:
+            data["emi_plan"] = emi_plan
+        if card_network:
+            data["card_network"] = card_network
+        if wallet_provider:
+            data["wallet_provider"] = wallet_provider
+        if bank_code:
+            data["bank_code"] = bank_code
+
+        # Legacy parameters
         if receipt:
             data["receipt"] = receipt
         if notes:
@@ -78,7 +116,7 @@ class PaymentsResource:
             idempotency_key = self._generate_idempotency_key()
 
         data = {"payment_id": payment_id}
-        if amount:
+        if amount is not None:
             data["amount"] = amount
 
         return await self.client.request(
