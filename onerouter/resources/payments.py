@@ -22,10 +22,11 @@ class PaymentsResource:
         idempotency_key: Optional[str] = None,
         # Payment method specific options
         upi_app: Optional[str] = None,
-        emi_plan: Optional[str] = None,
+        emi_plan: Optional[str] = None,  # '3_months', '6_months', '12_months', etc.
         card_network: Optional[str] = None,
         wallet_provider: Optional[str] = None,
-        bank_code: Optional[str] = None
+        bank_code: Optional[str] = None,
+        save_card: bool = False  # Save card for future payments
     ) -> Dict[str, Any]:
         """
         Create a payment order with payment method support
@@ -84,6 +85,8 @@ class PaymentsResource:
             data["wallet_provider"] = wallet_provider
         if bank_code:
             data["bank_code"] = bank_code
+        if save_card:
+            data["save_card"] = save_card
 
         # Legacy parameters
         if receipt:
@@ -109,15 +112,39 @@ class PaymentsResource:
         self,
         payment_id: str,
         amount: Optional[float] = None,
+        reason: Optional[str] = None,
+        speed: str = "normal",
+        notes: Optional[Dict[str, Any]] = None,
         idempotency_key: Optional[str] = None
     ) -> Dict[str, Any]:
-        """Create a refund (full or partial)"""
+        """
+        Create a refund with enhanced options
+
+        Args:
+            payment_id: Payment transaction ID to refund
+            amount: Refund amount (None for full refund)
+            reason: Reason for refund ('customer_request', 'duplicate', 'fraudulent', etc.)
+            speed: Refund speed ('normal', 'optimum' for Razorpay)
+            notes: Additional metadata for the refund
+            idempotency_key: Optional idempotency key
+
+        Returns:
+            Refund creation response
+        """
         if not idempotency_key:
             idempotency_key = self._generate_idempotency_key()
 
         data = {"payment_id": payment_id}
+
+        # Add optional parameters
         if amount is not None:
             data["amount"] = amount
+        if reason:
+            data["reason"] = reason
+        if speed != "normal":  # Only add if not default
+            data["speed"] = speed
+        if notes:
+            data["notes"] = notes
 
         return await self.client.request(
             method="POST",

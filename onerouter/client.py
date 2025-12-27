@@ -2,6 +2,8 @@ from .http_client import HTTPClient
 from .resources.payments import PaymentsResource
 from .resources.subscriptions import SubscriptionsResource
 from .resources.payment_links import PaymentLinksResource
+from .resources.saved_payment_methods import SavedPaymentMethodsResource
+from .resources.marketplace import MarketplaceResource
 
 
 # ============================================
@@ -18,8 +20,23 @@ class OneRouter:
         # Create payment
         order = await client.payments.create(amount=500.00, currency="INR")
 
-        # Create subscription
-        sub = await client.subscriptions.create(plan_id="plan_123")
+        # Create subscription with trial
+        sub = await client.subscriptions.create(plan_id="plan_123", trial_days=7)
+
+        # Enhanced refund
+        refund = await client.payments.refund("txn_123", amount=100.00, reason="customer_request")
+
+        # Manage saved payment methods
+        methods = await client.saved_payment_methods.list()
+
+        # Marketplace split payments
+        split_payment = await client.marketplace.create_split_payment(
+            amount=100.00,
+            splits=[
+                {"account_id": "vendor_123", "amount": 80.00, "type": "vendor"},
+                {"account_id": "platform", "amount": 15.00, "type": "fee"}
+            ]
+        )
     """
 
     def __init__(
@@ -55,6 +72,8 @@ class OneRouter:
         self.payments = PaymentsResource(self.http_client)
         self.subscriptions = SubscriptionsResource(self.http_client)
         self.payment_links = PaymentLinksResource(self.http_client)
+        self.saved_payment_methods = SavedPaymentMethodsResource(self.http_client)
+        self.marketplace = MarketplaceResource(self.http_client)
 
     async def close(self):
         """Close HTTP client (call this when done)"""
