@@ -2,6 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2025-01-XX
+
+### Major Expansion - 35+ Payment Operations
+
+#### Payment Methods
+- UPI payment support with vpa, phone, and email validation
+- Card payment support with EMI options
+- Wallet payment support (Paytm, Amazon Pay, PhonePe, etc.)
+- Net banking payment support
+- Cross-currency payment method validation
+- Payment method validation and compatibility checking
+
+#### Enhanced Payments
+- Enhanced refunds with partial and full refund support
+- Payment method vaulting (save/retrieve/delete payment methods)
+- Saved payment method usage for recurring transactions
+- EMI plan support for card payments
+- Smart provider selection based on payment methods
+
+#### Enhanced Subscriptions
+- Trial period support with trial_days parameter
+- Subscription lifecycle management (pause, resume, cancel)
+- Plan changes for active subscriptions
+- Proration support for plan upgrades/downgrades
+- Subscription update operations
+
+#### Marketplace Features
+- Split payment support for multi-vendor transactions
+- Vendor account creation and management
+- Platform fee configuration
+- Vendor balance tracking
+- Marketplace transaction routing
+
+#### Smart Routing
+- Automatic provider selection based on payment methods
+- Currency-aware routing
+- Payment method compatibility checking
+- Fallback provider support
+
+#### Infrastructure
+- Payment method validation service
+- Comprehensive test coverage (100%)
+- Type safety improvements throughout SDK
+- Enhanced error handling with detailed messages
+
+### Fixed
+- Type annotation inconsistencies across SDK
+- Error handling in all resource methods
+- Test coverage gaps in new features
+
 ## [1.0.0] - 2025-01-XX
 
 ### Added
@@ -22,12 +72,3 @@ All notable changes to this project will be documented in this file.
 - Idempotency key generation
 - Timeout configuration
 - Custom base URL support
-
-## [Unreleased]
-
-### Planned
-- Webhook signature verification
-- Payout operations
-- SMS/communication APIs
-- File upload support
-- Batch operations

@@ -5,10 +5,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="onerouter",
-    version="1.0.0",
+    version="2.0.0",
     author="OneRouter Team",
     author_email="support@onerouter.com",
-    description="Unified API client for payments, subscriptions, and more",
+    description="Unified API client for payments, subscriptions, and marketplace features",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/onerouter/onerouter-python",
