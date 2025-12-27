@@ -134,7 +134,7 @@ class PaymentsResource:
         if not idempotency_key:
             idempotency_key = self._generate_idempotency_key()
 
-        data = {"payment_id": payment_id}
+        data: Dict[str, Any] = {"payment_id": payment_id}
 
         # Add optional parameters
         if amount is not None:
