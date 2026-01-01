@@ -2,10 +2,10 @@
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[project]
-name = "onerouter"
-version = "2.0.0"
-description = "Unified API client for payments, subscriptions, and marketplace features"
+ [project]
+ name = "onerouter"
+ version = "2.0.1"
+ description = "Unified API client for payments, subscriptions, SMS, email, and marketplace features"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}

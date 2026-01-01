@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2025-01-01
+
+### Added
+- **SMS Communications Support** - Send SMS via Twilio
+- **Email Communications Support** - Send emails via Resend
+- SMS status checking and tracking
+- Email status checking and tracking
+- Cost tracking for SMS and email
+- Communications error handling
+- Service discovery for communications providers
+
+### Features
+- Send SMS with custom from number
+- Send HTML and plain text emails
+- Automatic provider selection (Twilio for SMS, Resend for email)
+- Per-message cost calculation
+- Request/response logging
+- Idempotency support for communications
+
+### Fixed
+- Version number consistency across build files
+- Updated package description to include SMS/Email features
+
 ## [2.0.0] - 2025-01-XX
 
 ### Major Expansion - 35+ Payment Operations
