@@ -13,9 +13,22 @@ class PaymentLinksResource:
         self,
         amount: float,
         description: str,
-        customer_email: Optional[str] = None
+        customer_email: Optional[str] = None,
+        callback_url: Optional[str] = None,
+        notes: Optional[Dict[str, str]] = None
     ) -> Dict[str, Any]:
-        """Create a payment link"""
+        """Create a payment link
+
+        Args:
+            amount: Payment amount in currency units
+            description: Payment description
+            customer_email: Customer's email address
+            callback_url: URL to redirect after payment completion
+            notes: Additional metadata (e.g., user_id, credits, type)
+
+        Returns:
+            Dict containing payment link details including id and short_url
+        """
         data = {
             "amount": amount,
             "description": description
@@ -23,6 +36,12 @@ class PaymentLinksResource:
 
         if customer_email:
             data["customer_email"] = customer_email
+
+        if callback_url:
+            data["callback_url"] = callback_url
+
+        if notes:
+            data["notes"] = notes
 
         return await self.client.request(
             method="POST",
