@@ -15,7 +15,8 @@ class PaymentLinksResource:
         description: str,
         customer_email: Optional[str] = None,
         callback_url: Optional[str] = None,
-        notes: Optional[Dict[str, str]] = None
+        notes: Optional[Dict[str, str]] = None,
+        environment: Optional[str] = None
     ) -> Dict[str, Any]:
         """Create a payment link
 
@@ -25,6 +26,7 @@ class PaymentLinksResource:
             customer_email: Customer's email address
             callback_url: URL to redirect after payment completion
             notes: Additional metadata (e.g., user_id, credits, type)
+            environment: Override environment for credential selection ("test" or "live")
 
         Returns:
             Dict containing payment link details including id and short_url
@@ -42,6 +44,9 @@ class PaymentLinksResource:
 
         if notes:
             data["notes"] = notes
+
+        if environment:
+            data["environment"] = environment
 
         return await self.client.request(
             method="POST",
