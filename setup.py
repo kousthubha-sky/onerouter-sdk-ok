@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="onerouter",
-    version="2.0.1",
+    version="2.0.5",
     author="OneRouter Team",
     author_email="support@onerouter.com",
     description="Unified API client for payments, subscriptions, SMS, email, and marketplace features",
