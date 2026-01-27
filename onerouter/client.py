@@ -4,6 +4,8 @@ from .resources.subscriptions import SubscriptionsResource
 from .resources.payment_links import PaymentLinksResource
 from .resources.saved_payment_methods import SavedPaymentMethodsResource
 from .resources.marketplace import MarketplaceResource
+from .resources.sms import SMSResource
+from .resources.email import EmailResource
 
 
 # ============================================
@@ -25,6 +27,16 @@ class OneRouter:
 
         # Enhanced refund
         refund = await client.payments.refund("txn_123", amount=100.00, reason="customer_request")
+
+        # Send SMS
+        sms = await client.sms.send(to="+1234567890", body="Your OTP is 123456")
+
+        # Send Email
+        email = await client.email.send(
+            to="user@example.com",
+            subject="Welcome!",
+            html_body="<h1>Welcome to OneRouter!</h1>"
+        )
 
         # Manage saved payment methods
         methods = await client.saved_payment_methods.list()
@@ -74,6 +86,8 @@ class OneRouter:
         self.payment_links = PaymentLinksResource(self.http_client)
         self.saved_payment_methods = SavedPaymentMethodsResource(self.http_client)
         self.marketplace = MarketplaceResource(self.http_client)
+        self.sms = SMSResource(self.http_client)
+        self.email = EmailResource(self.http_client)
 
     async def close(self):
         """Close HTTP client (call this when done)"""
