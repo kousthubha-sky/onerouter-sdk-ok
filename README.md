@@ -1,6 +1,9 @@
 # OneRouter Python SDK
 
-Official Python SDK for OneRouter - Unified API for payments, subscriptions, and more.
+Official Python SDK for OneRouter - Unified API for payments, SMS, email, and more.
+
+[![PyPI version](https://badge.fury.io/py/onerouter.svg)](https://pypi.org/project/onerouter/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
 ## Installation
 
@@ -13,7 +16,6 @@ pip install onerouter
 ```python
 from onerouter import OneRouter
 
-# Initialize client
 client = OneRouter(api_key="unf_live_xxx")
 
 # Create payment
@@ -28,12 +30,12 @@ print(f"Checkout URL: {order['checkout_url']}")
 
 ## Features
 
-- ✅ **Unified API**: Single interface for Razorpay, PayPal, Stripe, etc.
-- ✅ **Automatic Retries**: Built-in retry logic with exponential backoff
-- ✅ **Idempotency**: Prevent duplicate payments automatically
-- ✅ **Type Hints**: Full type support for better IDE autocomplete
-- ✅ **Error Handling**: Comprehensive exception hierarchy
-- ✅ **Async & Sync**: Support for both async/await and synchronous code
+- **Unified API**: Single interface for Razorpay, PayPal, Twilio, Resend
+- **Async & Sync**: Support for both async/await and synchronous code
+- **Automatic Retries**: Built-in retry logic with exponential backoff
+- **Idempotency**: Prevent duplicate requests automatically
+- **Type Hints**: Full type support for IDE autocomplete
+- **Error Handling**: Comprehensive exception hierarchy
 
 ## Usage Examples
 
@@ -64,7 +66,7 @@ async def main():
 asyncio.run(main())
 ```
 
-### Sync Usage (for non-async code)
+### Sync Usage
 
 ```python
 from onerouter import OneRouterSync
@@ -72,7 +74,6 @@ from onerouter import OneRouterSync
 client = OneRouterSync(api_key="unf_live_xxx")
 
 try:
-    # Create payment (no await needed)
     order = client.payments.create(
         amount=500.00,
         currency="INR"
@@ -82,37 +83,73 @@ finally:
     client.close()
 ```
 
+### Send SMS (Twilio)
+
+```python
+async with OneRouter(api_key="unf_live_xxx") as client:
+    # Send SMS
+    sms = await client.sms.send(
+        to="+1234567890",
+        body="Your verification code is 123456"
+    )
+
+    print(f"Message SID: {sms['message_id']}")
+    print(f"Status: {sms['status']}")
+
+    # Check delivery status
+    status = await client.sms.get(sms['message_id'])
+    print(f"Delivery status: {status['status']}")
+```
+
+### Send Email (Resend)
+
+```python
+async with OneRouter(api_key="unf_live_xxx") as client:
+    # Send email
+    email = await client.email.send(
+        to="user@example.com",
+        subject="Welcome to OneRouter!",
+        html_body="<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+        from_email="hello@yourdomain.com"  # Optional
+    )
+
+    print(f"Email ID: {email['email_id']}")
+    print(f"Status: {email['status']}")
+```
+
 ### Subscriptions
 
 ```python
-# Create subscription
-subscription = await client.subscriptions.create(
-    plan_id="plan_monthly_99",
-    customer_notify=True,
-    total_count=12
-)
+async with OneRouter(api_key="unf_live_xxx") as client:
+    # Create subscription
+    subscription = await client.subscriptions.create(
+        plan_id="plan_monthly_99",
+        customer_notify=True,
+        total_count=12
+    )
 
-# Get subscription
-sub_details = await client.subscriptions.get(subscription['id'])
+    # Get subscription
+    sub_details = await client.subscriptions.get(subscription['id'])
 
-# Cancel subscription
-await client.subscriptions.cancel(
-    subscription_id=subscription['id'],
-    cancel_at_cycle_end=True
-)
+    # Cancel subscription
+    await client.subscriptions.cancel(
+        subscription_id=subscription['id'],
+        cancel_at_cycle_end=True
+    )
 ```
 
 ### Payment Links
 
 ```python
-# Create payment link
-link = await client.payment_links.create(
-    amount=999.00,
-    description="Premium Plan",
-    customer_email="user@example.com"
-)
+async with OneRouter(api_key="unf_live_xxx") as client:
+    # Create payment link
+    link = await client.payment_links.create(
+        amount=999.00,
+        description="Premium Plan",
+        customer_email="user@example.com"
+    )
 
-print(f"Share this link: {link['short_url']}")
+    print(f"Share this link: {link['short_url']}")
 ```
 
 ### Error Handling
@@ -148,7 +185,7 @@ async with OneRouter(api_key="unf_live_xxx") as client:
 ```python
 client = OneRouter(
     api_key="unf_live_xxx",
-    base_url="https://api.onerouter.com",  # Optional: Custom API URL
+    base_url="https://api.onerouter.dev",  # Optional: Custom API URL
     timeout=30,                             # Optional: Request timeout (seconds)
     max_retries=3                           # Optional: Max retry attempts
 )
@@ -160,15 +197,29 @@ client = OneRouter(
 
 | Method | Description |
 |--------|-------------|
-| `payments.create()` | Create a payment order |
+| `payments.create(amount, currency, ...)` | Create a payment order |
 | `payments.get(transaction_id)` | Get payment details |
 | `payments.refund(payment_id, amount)` | Create refund |
+
+### SMS
+
+| Method | Description |
+|--------|-------------|
+| `sms.send(to, body)` | Send SMS message |
+| `sms.get(message_id)` | Get delivery status |
+
+### Email
+
+| Method | Description |
+|--------|-------------|
+| `email.send(to, subject, html_body, ...)` | Send email |
+| `email.get(email_id)` | Get email status |
 
 ### Subscriptions
 
 | Method | Description |
 |--------|-------------|
-| `subscriptions.create()` | Create subscription |
+| `subscriptions.create(plan_id, ...)` | Create subscription |
 | `subscriptions.get(subscription_id)` | Get subscription details |
 | `subscriptions.cancel(subscription_id)` | Cancel subscription |
 
@@ -176,7 +227,7 @@ client = OneRouter(
 
 | Method | Description |
 |--------|-------------|
-| `payment_links.create()` | Create payment link |
+| `payment_links.create(amount, ...)` | Create payment link |
 
 ## Testing
 
@@ -191,12 +242,25 @@ pytest
 pytest --cov=onerouter tests/
 ```
 
+## Requirements
+
+- Python 3.8+
+- httpx
+- pydantic
+
 ## Support
 
-- **Documentation**: https://docs.onerouter.com
+- **Documentation**: https://docs.onerouter.dev
+- **PyPI**: https://pypi.org/project/onerouter/
 - **GitHub**: https://github.com/onerouter/onerouter-python
-- **Email**: support@onerouter.com
+- **Email**: support@onerouter.dev
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - see LICENSE file for details.
+
+## Related
+
+- [Main Repository](../README.md)
+- [JavaScript SDK](../onerouter-js/README.md)
+- [Backend API](../backend/README.md)

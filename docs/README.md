@@ -1,4 +1,4 @@
-# OneRouter SDK v2.0.0 - Complete Documentation
+# OneRouter SDK v2.0.5 - Complete Documentation
 
 ## Table of Contents
 
@@ -11,6 +11,8 @@
 - [Saved Payment Methods](#saved-payment-methods)
 - [Marketplace](#marketplace)
 - [Payment Links](#payment-links)
+- [SMS](#sms)
+- [Email](#email)
 - [Error Handling](#error-handling)
 - [Advanced Features](#advanced-features)
 - [Examples](#examples)
@@ -73,7 +75,7 @@ pip install onerouter[dev]
 
 ```python
 import onerouter
-print(onerouter.__version__)  # 2.0.0
+print(onerouter.__version__)  # 2.0.5
 ```
 
 ---
@@ -504,16 +506,34 @@ balance = client.marketplace.get_vendor_balance(vendor_id="vendor_123")
 ### Create Payment Link
 
 ```python
-payment_link = client.payment_links.create(
+payment_link = await client.payment_links.create(
     amount=1000,
-    currency="USD",
     description="Product Purchase",
-    customer_id="cust_123",
-    expires_at="2025-01-31T23:59:59Z",
-    metadata={
+    customer_email="customer@example.com",
+    callback_url="https://yoursite.com/payment-complete",
+    provider="razorpay",  # or "paypal"
+    environment="test",   # or "live"
+    notes={
         "order_id": "order_123"
     }
 )
+
+# Response includes checkout URL
+print(payment_link["checkout_url"])
+```
+
+### Create PayPal Payment Link
+
+```python
+payment_link = await client.payment_links.create(
+    amount=10,
+    description="Credit Purchase",
+    provider="paypal",
+    environment="test"
+)
+
+# PayPal sandbox checkout URL
+print(payment_link["checkout_url"])  # https://www.sandbox.paypal.com/checkoutnow?token=...
 ```
 
 ### Get Payment Link
@@ -532,6 +552,65 @@ payment_links = client.payment_links.list(limit=10)
 
 ```python
 payment_link = client.payment_links.deactivate(link_id="link_123")
+```
+
+---
+
+## SMS
+
+### Send SMS
+
+```python
+result = await client.sms.send(
+    to="+1234567890",
+    body="Your OTP is 123456. Valid for 10 minutes.",
+    provider="twilio"  # default
+)
+
+print(result)
+# {
+#     "message_id": "SM123456789",
+#     "status": "sent",
+#     "service": "twilio",
+#     "cost": 0.0079,
+#     "currency": "USD"
+# }
+```
+
+### Get SMS Status
+
+```python
+status = await client.sms.get_status(message_id="SM123456789")
+```
+
+---
+
+## Email
+
+### Send Email
+
+```python
+result = await client.email.send(
+    to="user@example.com",
+    subject="Welcome!",
+    html_body="<h1>Welcome!</h1><p>Your account is ready.</p>",
+    provider="resend"  # default
+)
+
+print(result)
+# {
+#     "email_id": "EM123456789",
+#     "status": "sent",
+#     "service": "resend",
+#     "cost": 0.0001,
+#     "currency": "USD"
+# }
+```
+
+### Get Email Status
+
+```python
+status = await client.email.get_status(email_id="EM123456789")
 ```
 
 ---
